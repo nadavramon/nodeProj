@@ -1,0 +1,26 @@
+{
+  "name": "nodeproj",
+  "version": "1.0.0",
+  "description": "A hands-on exploration of Node.js core modules and asynchronous programming patterns to understand the V8 runtime environment",
+  "keywords": [
+    "node",
+    "v8",
+    "async",
+    "event-loop"
+  ],
+  "homepage": "https://github.com/nadavramon/nodeProj#readme",
+  "bugs": {
+    "url": "https://github.com/nadavramon/nodeProj/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nadavramon/nodeProj.git"
+  },
+  "license": "ISC",
+  "author": "Nadav Ramon",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test"
+  }
+}
