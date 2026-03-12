@@ -21,6 +21,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "dev": "node --env-file=.env.dev index.js",
+    "prod": "node --env-file=.env.prod index.js",
     "test": "vitest run",
     "format": "prettier --write \"src/**/*.js\""
   },
