@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getIntervalCheckpoints } from './date.js';
+import { getIntervalCheckpoints } from '../src/dates/index.js';
 
 describe('getIntervalCheckpoints', () => {
   it('returns checkpoints aligned by the default interval (day)', () => {
