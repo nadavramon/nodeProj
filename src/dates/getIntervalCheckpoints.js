@@ -40,8 +40,12 @@ export function getIntervalCheckpoints(startDate, endDate, interval = INTERVALS.
   const end = new Date(endDate);
 
   // Validate inputs
-  if (!isValid(start) || !isValid(end)) return [];
-  if (!isBefore(start, end)) return []; // Stop if start is after end
+  if (!isValid(start)) throw new Error(`Invalid start date: "${startDate}"`);
+  if (!isValid(end)) throw new Error(`Invalid end date: "${endDate}"`);
+
+  // If start is strictly after end, return nothing. 
+  // If start === end, we still proceed to return a single checkpoint.
+  if (start > end) return []; 
 
   const checkpoints = [];
 
