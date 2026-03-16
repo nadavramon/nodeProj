@@ -23,8 +23,9 @@
   "scripts": {
     "dev": "node --env-file=.env.dev index.js",
     "prod": "node --env-file=.env.prod index.js",
-    "test": "vitest run",
-    "format": "prettier --write \"src/**/*.js\""
+    "test": "vitest run --exclude test/scheduler/test-trigger.test.js",
+    "format": "prettier --write \"src/**/*.js\"",
+    "test-email": "node --env-file=.env.dev test/scheduler/test-trigger.test.js"
   },
   "devDependencies": {
     "prettier": "^3.8.1",
@@ -32,6 +33,8 @@
   },
   "dependencies": {
     "date-fns": "^4.1.0",
-    "date-fns-tz": "^3.2.0"
+    "date-fns-tz": "^3.2.0",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.2"
   }
 }

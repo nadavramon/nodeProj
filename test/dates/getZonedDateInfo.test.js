@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { getZonedDateInfo } from "../src/dates/index.js";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { getZonedDateInfo } from "../../src/dates/index.js";
 
 /**
  * Tests for the getZonedDateInfo utility.

@@ -2,37 +2,37 @@ import { add, isBefore, isEqual, isValid } from "date-fns";
 
 // Defines all valid interval key strings
 export const INTERVALS = {
-  YEAR:     "year",
-  MONTH:    "month",
-  WEEK:     "week",
-  DAY:      "day",
+  YEAR: "year",
+  MONTH: "month",
+  WEEK: "week",
+  DAY: "day",
   HALF_DAY: "half day",
-  HOUR:     "hour",
-  MINUTE:   "minute",
-  SECOND:   "second",
+  HOUR: "hour",
+  MINUTE: "minute",
+  SECOND: "second",
 };
 
 // Defines the date-fns unit strings used in add() configurations
 export const DATE_UNITS = {
-  YEARS:   "years",
-  MONTHS:  "months",
-  WEEKS:   "weeks",
-  DAYS:    "days",
-  HOURS:   "hours",
+  YEARS: "years",
+  MONTHS: "months",
+  WEEKS: "weeks",
+  DAYS: "days",
+  HOURS: "hours",
   MINUTES: "minutes",
   SECONDS: "seconds",
 };
 
 // Maps each INTERVALS value to its date-fns add() configuration
 export const INTERVAL_MAP = {
-  [INTERVALS.YEAR]:     { [DATE_UNITS.YEARS]:   1 },
-  [INTERVALS.MONTH]:    { [DATE_UNITS.MONTHS]:  1 },
-  [INTERVALS.WEEK]:     { [DATE_UNITS.WEEKS]:   1 },
-  [INTERVALS.DAY]:      { [DATE_UNITS.DAYS]:    1 },
-  [INTERVALS.HALF_DAY]: { [DATE_UNITS.HOURS]:  12 },
-  [INTERVALS.HOUR]:     { [DATE_UNITS.HOURS]:   1 },
-  [INTERVALS.MINUTE]:   { [DATE_UNITS.MINUTES]: 1 },
-  [INTERVALS.SECOND]:   { [DATE_UNITS.SECONDS]: 1 },
+  [INTERVALS.YEAR]: { [DATE_UNITS.YEARS]: 1 },
+  [INTERVALS.MONTH]: { [DATE_UNITS.MONTHS]: 1 },
+  [INTERVALS.WEEK]: { [DATE_UNITS.WEEKS]: 1 },
+  [INTERVALS.DAY]: { [DATE_UNITS.DAYS]: 1 },
+  [INTERVALS.HALF_DAY]: { [DATE_UNITS.HOURS]: 12 },
+  [INTERVALS.HOUR]: { [DATE_UNITS.HOURS]: 1 },
+  [INTERVALS.MINUTE]: { [DATE_UNITS.MINUTES]: 1 },
+  [INTERVALS.SECOND]: { [DATE_UNITS.SECONDS]: 1 },
 };
 
 export function getIntervalCheckpoints(startDate, endDate, interval = INTERVALS.DAY) {
@@ -43,9 +43,9 @@ export function getIntervalCheckpoints(startDate, endDate, interval = INTERVALS.
   if (!isValid(start)) throw new Error(`Invalid start date: "${startDate}"`);
   if (!isValid(end)) throw new Error(`Invalid end date: "${endDate}"`);
 
-  // If start is strictly after end, return nothing. 
+  // If start is strictly after end, return nothing.
   // If start === end, we still proceed to return a single checkpoint.
-  if (start > end) return []; 
+  if (start > end) return [];
 
   const checkpoints = [];
 
