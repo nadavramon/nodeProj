@@ -16,7 +16,8 @@ export function formatDateRange(startDate, endDate, formatKeyOrString = DATE_FOR
   const end = new Date(endDate);
 
   // Validate inputs
-  if (!isValid(start) || !isValid(end)) throw new Error("Invalid date range: one or both dates are invalid");
+  if (!isValid(start) || !isValid(end))
+    throw new Error("Invalid date range: one or both dates are invalid");
 
   // Sort dates chronologically (earliest to latest)
   const [earliest, latest] = !isBefore(start, end) ? [end, start] : [start, end];
