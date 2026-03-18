@@ -1,4 +1,4 @@
-import config from "../../../config.js";
+import config from "../../configs/app-config.js";
 
 const levels = {
   info: 0,
@@ -11,7 +11,7 @@ const currentLevel = levels[config.logLevel?.toLowerCase()] ?? 0;
 const getTimestamp = () => new Date().toISOString().replace("T", " ").split(".")[0];
 
 const formatMessage = (level, component, message, metadata = {}) => {
-  const metaString = Object.keys(metadata).length ? ` ${JSON.stringify(metadata)}` : "";
+  const metaString = Object.keys(metadata).length ? `\n${JSON.stringify(metadata, null, 2)}` : "";
   return `[${getTimestamp()}] [${level.toUpperCase()}] [${component.toUpperCase()}] ${message}${metaString}`;
 };
 

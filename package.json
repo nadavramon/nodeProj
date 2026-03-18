@@ -19,13 +19,13 @@
   "license": "ISC",
   "author": "Nadav Ramon",
   "type": "module",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "dev": "node --env-file=.env.dev index.js",
-    "prod": "node --env-file=.env.prod index.js",
-    "test": "vitest run --exclude test/scheduler/test-trigger.test.js",
+    "dev": "node --env-file=.env.dev src/index.js",
+    "prod": "node --env-file=.env.prod src/index.js",
+    "test": "vitest run",
     "format": "prettier --write \"src/**/*.js\"",
-    "test-email": "node --env-file=.env.dev test/scheduler/test-trigger.test.js"
+    "test-email": "node --env-file=.env.dev src/__test__/scheduler/test-trigger.js"
   },
   "devDependencies": {
     "prettier": "^3.8.1",
