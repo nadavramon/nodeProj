@@ -1,12 +1,19 @@
-/**
- * Generates both plain-text and HTML bodies for the morning email.
- * Data is extracted first into a neutral structure, then rendered
- * into each format independently so they can diverge as needed.
- * @param {object} dateInfo - Information from getZonedDateInfo.
- * @param {object|null} weather - Current weather data.
- * @param {number|null} exchangeRate - Current ILS rate.
- * @returns {{ text: string, html: string }} The formatted email bodies.
- */
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Read the HTML template once when the module loads, so we don't hit the disk constantly
+const rawHtmlTemplate = fs.readFileSync(
+  path.join(__dirname, "templates", "daily-report.html"),
+  "utf8",
+);
+
+// Generates both plain-text and HTML bodies for the morning email.
+// Data is extracted first into a neutral structure, then rendered
+// into each format independently so they can diverge as needed.
 export const generateEmailTemplate = (dateInfo, weather, exchangeRate) => {
   // 1. Extract structured data
   const date = `${dateInfo.dayInAWeek}, ${dateInfo.monthInText} ${dateInfo.day}, ${dateInfo.year}`;
@@ -44,22 +51,11 @@ Have a great day!
     ? `USD to ILS Exchange Rate: <strong>${rateData} ₪</strong>`
     : "USD to ILS Exchange Rate: Unavailable right now.";
 
-  const html = `
-<!DOCTYPE html>
-<html>
-  <head><meta charset="UTF-8" /></head>
-  <body style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-    <h2 style="color: #e8a020;">&#9728;&#65039; Good morning!</h2>
-    <p>Today is <strong>${date}</strong>.</p>
-    <h3>Your daily update:</h3>
-    <ul>
-      <li>${weatherHtml}</li>
-      <li>${exchangeHtml}</li>
-    </ul>
-    <p>Have a great day!</p>
-  </body>
-</html>
-  `.trim();
+  // Inject variables into the HTML string
+  const html = rawHtmlTemplate
+    .replace("{{date}}", date)
+    .replace("{{weatherHtml}}", weatherHtml)
+    .replace("{{exchangeHtml}}", exchangeHtml);
 
   return { text, html };
 };
