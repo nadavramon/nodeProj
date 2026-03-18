@@ -1,11 +1,11 @@
-import config from "../../config.js";
-import * as logger from "./utils/logger.js";
+import config from "../configs/app-config.js";
+import * as logger from "../scheduler/utils/logger.js";
 
 /**
  * Generic fetch helper with a simple retry mechanism.
  * url is the endpoint to hit and retries is the number of attempts to make.
  */
-const fetchWithRetry = async (url, retries = 3) => {
+export const fetchWithRetry = async (url, retries = 3) => {
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(url);
@@ -24,7 +24,7 @@ const fetchWithRetry = async (url, retries = 3) => {
  * Network/retry failures and response shape failures are caught and logged separately.
  * Returns null on either failure so the caller can degrade gracefully.
  */
-const fetchData = async (url, extract) => {
+export const fetchData = async (url, extract) => {
   let data;
   try {
     data = await fetchWithRetry(url);
@@ -39,23 +39,3 @@ const fetchData = async (url, extract) => {
     return null;
   }
 };
-
-/**
- * Fetches current weather data.
- * Returns the current_weather object or null on failure.
- */
-export const fetchWeather = () =>
-  fetchData(config.weatherApiUrl, (data) => {
-    if (!data?.current_weather) throw new Error("Unexpected weather response shape");
-    return data.current_weather;
-  });
-
-/**
- * Fetches the current USD → ILS exchange rate.
- * Returns the ILS rate or null on failure.
- */
-export const fetchExchangeRate = () =>
-  fetchData(config.exchangeRateApiUrl, (data) => {
-    if (!data?.rates?.ILS) throw new Error("Unexpected exchange rate response shape");
-    return data.rates.ILS;
-  });
