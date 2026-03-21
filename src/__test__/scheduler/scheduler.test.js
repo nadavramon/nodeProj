@@ -8,12 +8,13 @@
  * Run with: npm test
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { startMorningScheduler } from "../../scheduler/scheduler.js";
+import { startScheduler } from "../../scheduler/scheduler.js";
+import { sendDailyReport } from "../../scheduler/dailyReport/dailyReport-job.js";
 import cron from "node-cron";
 import nodemailer from "nodemailer";
 
 // Mock logger
-vi.mock("../../scheduler/utils/logger.js", () => ({
+vi.mock("../../utils/logger.js", () => ({
   info: vi.fn(),
   warn: vi.fn(),
   error: vi.fn(),
@@ -76,7 +77,7 @@ describe("Morning Scheduler", () => {
      * Use case: Getting your local daily digest exactly when you wake up.
      */
     it("should schedule a job for 9:00 AM", () => {
-      startMorningScheduler();
+      startScheduler(sendDailyReport);
 
       expect(cron.schedule).toHaveBeenCalledWith(
         "0 9 * * *",
@@ -109,7 +110,7 @@ describe("Morning Scheduler", () => {
         }
       });
 
-      startMorningScheduler();
+      startScheduler(sendDailyReport);
       await cronCallback();
 
       const transporter = nodemailer.createTransport();
@@ -140,7 +141,7 @@ describe("Morning Scheduler", () => {
     it("should handle API failures gracefully", async () => {
       global.fetch.mockReturnValue(Promise.resolve({ ok: false, status: 500 }));
 
-      startMorningScheduler();
+      startScheduler(sendDailyReport);
       const cronPromise = cronCallback();
 
       // Fast-forward through all potential retries for both APIs
@@ -176,7 +177,7 @@ describe("Morning Scheduler", () => {
         });
       });
 
-      startMorningScheduler();
+      startScheduler(sendDailyReport);
       const cronPromise = cronCallback();
 
       // Flat retry delay = retryDelay (100ms) — advance enough to cover all retries

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getIntervalCheckpoints } from "../../dates/getIntervalCheckpoints.js";
+import { getIntervalCheckpoints } from "../../utils/dates/getIntervalCheckpoints.js";
 
 /**
  * Tests for the getIntervalCheckpoints utility.

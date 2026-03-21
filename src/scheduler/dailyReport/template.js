@@ -5,11 +5,18 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Read the HTML template once when the module loads, so we don't hit the disk constantly
-const rawHtmlTemplate = fs.readFileSync(
-  path.join(__dirname, "templates", "daily-report.html"),
-  "utf8",
-);
+// Cache the template in memory after the first read - avoid reading the file from the disk on every email send.
+let rawHtmlTemplate = null;
+
+const getTemplate = () => {
+  if (!rawHtmlTemplate) {
+    rawHtmlTemplate = fs.readFileSync(
+      path.join(__dirname, "daily-report.html"),
+      "utf8",
+    );
+  }
+  return rawHtmlTemplate;
+};
 
 // Generates both plain-text and HTML bodies for the morning email.
 // Data is extracted first into a neutral structure, then rendered
@@ -52,10 +59,11 @@ Have a great day!
     : "USD to ILS Exchange Rate: Unavailable right now.";
 
   // Inject variables into the HTML string
-  const html = rawHtmlTemplate
-    .replace("{{date}}", date)
-    .replace("{{weatherHtml}}", weatherHtml)
-    .replace("{{exchangeHtml}}", exchangeHtml);
+  const template = getTemplate();
+  const html = template
+    .replaceAll("{{date}}", date)
+    .replaceAll("{{weatherHtml}}", weatherHtml)
+    .replaceAll("{{exchangeHtml}}", exchangeHtml);
 
   return { text, html };
 };
