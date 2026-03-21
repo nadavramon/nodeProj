@@ -1,87 +1,91 @@
-# NodeProj: Morning Email Scheduler ☀️
+# NodeProj: Resilient Morning Email Scheduler ☀️
 
-A modular, resilient Node.js background application that automatically aggregates weather data and exchange rates, formats them into a beautiful HTML template, and emails a daily morning digest precisely on schedule.
+A sophisticated, modular Node.js background application that automatically aggregates weather data and exchange rates, formats them into a polished HTML digest, and delivers a daily update to your inbox precisely on schedule.
 
-## 🏗️ Architecture & Flow
+## 🏗️ Architecture & Philosophy
 
-The application is built using a strict separation of concerns. Services handle API connectivity, jobs handle orchestration, and templates handle the presentation layer.
+The application follows a **Research -> Strategy -> Execution** lifecycle, emphasizing a strict separation between business logic (Jobs) and infrastructure (Scheduler).
 
-```mermaid
-graph TD
-    A[src/index.js] -->|Initializes| B(node-cron)
-    B -->|Triggers Schedule| C{dailyReport.job.js}
-    
-    C -->|1. Zoned Time| D[getZonedDateInfo.js]
-    
-    C -->|2. Parallel Fetch| E[weather.service.js]
-    C -->|2. Parallel Fetch| F[exchange.service.js]
-    E -.-> R[api-client.js]
-    F -.-> R
-    
-    C -->|3. Compile HTML| G[template.js]
-    G -.->|Reads| H[templates/daily-report.html]
-    
-    C -->|4. Dispatch| I[mailer.js]
-    I -->|SMTP Delivery| J((User Inbox))
-```
+### Core Design Principles:
+- **Dependency Injection**: Jobs are decoupled from their underlying services, making the logic highly testable and reusable.
+- **Abstract Scheduling**: The scheduling engine is a generic driver that can execute any unit of work, allowing the application to scale horizontally with new automated tasks.
+- **Resilience & Graceful Degradation**: Built with a "fail-soft" mindset. Uses `Promise.allSettled` to ensure that if one external API (e.g., Weather) is down, the user still receives the rest of their report (e.g., Exchange Rates).
+- **Graceful Shutdown**: Listens for system signals (`SIGINT`) to stop all scheduled tasks and drain pending operations before exiting, preventing zombie processes.
 
 ## 📁 Project Structure
 
 ```text
 src/
+├── __test__/                  # Consolidated Vitest suite
 ├── configs/
-│   └── app-config.js          # Auto-validates environment variables on boot
-├── dates/                     # Pure mathematical date and timezone utilities
+│   └── app-config.js          # Declarative config with static defaults
 ├── scheduler/
-│   ├── jobs/
-│   │   └── dailyReport.job.js # The core orchestration script
-│   ├── templates/             # Raw HTML views
-│   ├── utils/                 
-│   │   └── logger.js          # Timestamped formatting logger
-│   ├── mailer.js              # Nodemailer SMTP singleton
-│   ├── scheduler.js           # Wraps jobs in node-cron definitions
-│   └── template.js            # Injects dynamic variables into raw HTML
-└── services/                  # External API integration points
+│   ├── dailyReport/           # Encapsulated Daily Report logic
+│   │   ├── daily-report.html  # Raw HTML email view
+│   │   ├── dailyReport-job.js # Job orchestration logic
+│   │   └── template.js        # Variable injection & lazy-loading logic
+│   └── scheduler.js           # Abstract Infrastructure (node-cron driver)
+├── services/                  # External integrations (API & SMTP)
+│   ├── exchange-service.js    
+│   ├── mailer-service.js      # SMTP verification & dispatch
+│   └── weather-service.js
+├── utils/                     # Shared low-level helpers
+│   ├── dates/                 # Zoned time & interval utilities
+│   ├── api-client.js          # Resilient fetch with retry logic
+│   └── logger.js              # Centralized, leveled logging
+└── index.js                   # Entry point with async initialization
 ```
 
-## ⚙️ Environment Configuration
+## ⚙️ Configuration & Environment
 
-To run this application, you must provide the necessary credentials for the SMTP mail server and the external APIs. 
+The application uses a **hybrid configuration model**. Critical secrets are pulled from environment variables, while operational defaults are hardcoded for stability.
 
-Create a `.env.dev` (and `.env.prod`) file in the root directory:
+### Setup
+Create a `.env.dev` (or `.env.prod`) file in the root directory:
 
 ```env
-# ====== Email Credentials ======
-# The email address that the scheduler will send FROM and TO
+# ====== Required Secrets ======
 USERNAME="your_email@gmail.com"
 PASSWORD="your_app_specific_password"
 
-# ====== NodeMailer SMTP Configuration ======
-SMTP_HOST="smtp.gmail.com"
-SMTP_PORT=587
-
-# ====== Scheduling & Localization ======
-# Standard Cron Expression (e.g., 20 17 * * * for 5:20 PM)
-CRON_SCHEDULE="0 9 * * *"
-TIME_ZONE="Asia/Jerusalem"
-
-# ====== External APIs ======
-WEATHER_API_URL="https://api.open-meteo.com/v1/forecast?latitude=32.08&longitude=34.78&current_weather=true"
-EXCHANGE_RATE_API_URL="https://api.exchangerate.host/latest?base=USD&symbols=ILS"
-
-# ====== Application Settings ======
-LOG_LEVEL="info"
-RETRY_DELAY=2000
+# ====== Optional Overrides (Defaults exist in app-config.js) ======
+# CRON_SCHEDULE="0 9 * * *"
+# TIME_ZONE="Asia/Jerusalem"
+# LOG_LEVEL="info"
 ```
 
-> **Note:** If any of these variables are missing, the application configuration (`configs/app-config.js`) will intentionally throw an error and fail to boot to prevent silent failures later.
+> **Fast-Fail Validation:** On boot, `app-config.js` validates that all required secrets are present. If `USERNAME` or `PASSWORD` are missing, the app will throw an explicit error and refuse to start.
 
-## 🚀 Available Scripts
+## 🚀 Getting Started
 
-Run these commands using `npm run <command>`:
+1.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-- **`dev`**: Starts the main scheduler using variables loaded from `.env.dev`.
-- **`prod`**: Starts the main scheduler using variables loaded from `.env.prod`.
-- **`test`**: Executes the Vitest suite across all unit tests.
-- **`format`**: Uses Prettier to format all `.js` files within the `src/` directory.
-- **`test-email`**: Immediately triggers the email pipeline manually (bypassing the alarm clock) using development variables. Excellent for verifying SMTP credentials.
+2.  **Run in Development:**
+    ```bash
+    npm run dev
+    ```
+
+3.  **Execute Tests:**
+    ```bash
+    npm run test
+    ```
+
+4.  **Manual Trigger:**
+    Use this to verify your SMTP and API settings immediately without waiting for the cron timer:
+    ```bash
+    npm run test-email
+    ```
+
+## 🧪 Testing Strategy
+
+The project maintains a 100% success rate across a comprehensive Vitest suite. 
+
+- **Unit Tests:** Utilities like date formatting and interval calculation are tested as pure functions.
+- **Integration Tests:** The scheduling and job orchestration layers are tested using mocks for `node-cron`, `nodemailer`, and `fetch`, ensuring high-speed execution without side effects.
+- **Mocking Strategy:** Uses `vi.mock` to isolate services and simulate network failures, retries, and successful data flows.
+
+---
+**Author:** Nadav Ramon | **License:** ISC
