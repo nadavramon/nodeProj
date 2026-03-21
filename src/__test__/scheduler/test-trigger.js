@@ -4,8 +4,8 @@
  *
  * NOTE: Requires .env.dev with valid USERNAME, PASSWORD, SMTP, and API config.
  */
-import { sendDailyReport } from "../../scheduler/jobs/dailyReport.job.js";
-import * as logger from "../../scheduler/utils/logger.js";
+import { sendDailyReport } from "../../scheduler/dailyReport/dailyReport-job.js";
+import * as logger from "../../utils/logger.js";
 
 logger.info("test", "Manually triggering the morning email report");
 

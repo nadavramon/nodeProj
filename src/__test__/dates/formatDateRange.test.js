@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatDateRange } from "../../dates/formatDateRange.js";
+import { formatDateRange } from "../../utils/dates/formatDateRange.js";
 
 /**
  * Tests for the formatDateRange utility.

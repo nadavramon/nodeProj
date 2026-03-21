@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import config from "../configs/app-config.js";
-import * as logger from "./utils/logger.js";
+import * as logger from "../utils/logger.js";
 
 // Module-level singleton transporter — created once and reused for every send.
 const transporter = nodemailer.createTransport({
@@ -13,15 +13,18 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Verify SMTP connectivity at startup so misconfigurations surface immediately.
-transporter.verify().then(
-  () => logger.info("email", "SMTP connection verified"),
-  (error) =>
-    logger.warn("email", "SMTP connection could not be verified", { error: error.message }),
-);
+// Verify SMTP connectivity explicitly.
+export async function verifyConnection() {
+  try {
+    await transporter.verify();
+    logger.info("email", "SMTP connection verified");
+  } catch (error) {
+    logger.warn("email", "SMTP connection could not be verified", { error: error.message });
+  }
+};
 
 // Sends an email with the given options and handles logging.
-export const sendEmail = async (mailOptions) => {
+export async function sendEmail(mailOptions) {
   try {
     const info = await transporter.sendMail(mailOptions);
     logger.info("email", "Email sent successfully", { messageId: info.messageId });

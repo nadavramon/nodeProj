@@ -1,13 +1,33 @@
-import { startMorningScheduler } from "./scheduler/scheduler.js";
-import * as logger from "./scheduler/utils/logger.js";
+import { startScheduler } from "./scheduler/scheduler.js";
+import { verifyConnection } from "./services/mailer-service.js";
+import * as logger from "./utils/logger.js";
+import { sendDailyReport } from "./scheduler/dailyReport/dailyReport-job.js";
 
-const shutdown = () => {
-  logger.info("system", "Shutting down gracefully");
-  process.exit(0);
-};
+let task;
+
+function shutdown() {
+    logger.info("system", "Shutting down gracefully");
+
+    task?.stop();
+
+    process.exit(0);
+}
 
 process.on("SIGINT", shutdown); // signal sent when you press Ctrl+C in your terminal.
 
-// Initialize the scheduled actions.
-// Success is logged inside startMorningScheduler once the schedule is confirmed.
-startMorningScheduler();
+async function start() {
+    try {
+        logger.info("system", "Starting application...");
+
+        // 1. Verify critical connections
+        await verifyConnection();
+
+        // 2. Start the schedule
+        task = startScheduler(sendDailyReport);
+    } catch (error) {
+        logger.error("system", "Failed to start application", { error: error.message });
+        process.exit(1);
+    }
+}
+
+start();
